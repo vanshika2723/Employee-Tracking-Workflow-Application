@@ -38,14 +38,6 @@ const EmployeeDashboard = ({ data }) => {
   const emp = data.employee;
 const [notificationCount, setNotificationCount] = useState(0);
   const [activity, setActivity] = useState(null);
-
-const [liveActivity, setLiveActivity] = useState({
-  activeTime: 0,
-  idleTime: 0,
-  breakTime: 0,
-});
-
-
   const [productivity, setProductivity] = useState(null);
   const [attendance, setAttendance] = useState(null);
   const [dashboardStats, setDashboardStats] = useState(null);
@@ -56,21 +48,15 @@ const [liveActivity, setLiveActivity] = useState({
 
   useActivityTracker(attendance?.status === "ONLINE");
 
+  const formatTime = (seconds = 0) => {
+    const totalMinutes = Math.floor(seconds / 60);
 
-const formatTime = (seconds = 0) => {
-  const totalSeconds = Math.max(0, Math.floor(Number(seconds) || 0));
+    
 
-  const hours = Math.floor(totalSeconds / 3600);
-  const minutes = Math.floor((totalSeconds % 3600) / 60);
-  const secs = totalSeconds % 60;
+    const minutes = totalMinutes % 60;
 
-  return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(
-    2,
-    "0"
-  )}:${String(secs).padStart(2, "0")}`;
-};
-
-
+    return ` ${minutes}m`;
+  };
   const formatTaskTime = (duration = 0, startTime, status) => {
   if (status === "PAUSED" || !startTime) {
     return formatClockDuration(duration);
@@ -197,54 +183,6 @@ useEffect(() => {
 
   return () => clearInterval(interval);
 }, []);
-
-useEffect(() => {
-  if (!activity) return;
-
-  setLiveActivity({
-    activeTime: Number(activity.activeTime) || 0,
-    idleTime: Number(activity.idleTime) || 0,
-    breakTime: Number(activity.breakTime) || 0,
-  });
-}, [activity]);
-
-useEffect(() => {
-  if (!attendance?.loginTime || !activity) return;
-
-  const interval = setInterval(() => {
-    setLiveActivity((prev) => {
-      // Break par ho to active/idle timer ko increase mat karo
-      if (activity.isOnBreak) {
-        return {
-          ...prev,
-          breakTime: prev.breakTime + 1,
-        };
-      }
-
-      // Idle state mein idle timer chalega
-      if (activity.idleStatus === "IDLE") {
-        return {
-          ...prev,
-          idleTime: prev.idleTime + 1,
-        };
-      }
-
-      // Normal active state mein active timer chalega
-      return {
-        ...prev,
-        activeTime: prev.activeTime + 1,
-      };
-    });
-  }, 1000);
-
-  return () => clearInterval(interval);
-}, [
-  activity?.isOnBreak,
-  activity?.idleStatus,
-  attendance?.loginTime,
-]);
-
-
   useEffect(() => {
     api
       .get("/attendance/status")
@@ -545,15 +483,13 @@ useEffect(() => {
       </div>
 
       <div>
-       <div>
-  <h3 className="text-2xl font-bold tracking-tight tabular-nums text-slate-900 dark:text-white">
-    {card.value}
-  </h3>
+        <h3 className="text-2xl font-bold text-slate-900 dark:text-white">
+          {card.value}
+        </h3>
 
-  <p className="mt-1 text-xs font-medium text-slate-500 dark:text-slate-400">
-    {card.sub}
-  </p>
-</div>
+        <p className="text-sm text-slate-500 mt-1">
+          {card.sub}
+        </p>
       </div>
     </div>
   </div>
@@ -606,7 +542,7 @@ useEffect(() => {
             <div>
               <p className="text-sm text-slate-500">Active Time</p>
               <h3 className="text-2xl font-bold">
-                {formatTime(liveActivity.activeTime)}
+                {formatTime(activity?.activeTime)}
               </h3>
             </div>
           </div>
@@ -622,7 +558,7 @@ useEffect(() => {
             <div>
               <p className="text-sm text-slate-500">Idle Time</p>
               <h3 className="text-2xl font-bold">
-                {formatTime(liveActivity.idleTime)}
+                {formatTime(activity?.idleTime)}
               </h3>
             </div>
           </div>
@@ -638,7 +574,7 @@ useEffect(() => {
             <div>
               <p className="text-sm text-slate-500">Break Time</p>
               <h3 className="text-2xl font-bold">
-                {formatTime(liveActivity.breakTime)}
+                {formatTime(activity?.breakTime)}
               </h3>
             </div>
           </div>
@@ -654,11 +590,11 @@ useEffect(() => {
             <div>
               <p className="text-sm text-slate-500">Work Hours</p>
               <h3 className="text-2xl font-bold">
-          {      formatTime(
-  liveActivity.activeTime +
-  liveActivity.idleTime +
-  liveActivity.breakTime
-)}
+                {formatTime(
+                  (activity?.activeTime || 0) +
+                    (activity?.idleTime || 0) +
+                    (activity?.breakTime || 0)
+                )}
               </h3>
             </div>
           </div>
