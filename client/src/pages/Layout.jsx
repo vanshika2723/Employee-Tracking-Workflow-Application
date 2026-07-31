@@ -1,6 +1,6 @@
 import {Outlet} from "react-router-dom";
 import Sidebar from "../components/Sidebar";
-import { useAuth } from "../context/authContext";
+import { useAuth } from "../context/AuthContext";
 import Loading from "../components/Loading";
 import { Navigate } from "react-router-dom";
 import NotificationBell from "../components/notifications/NotificationBell";

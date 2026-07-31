@@ -1,7 +1,7 @@
 import LoginLeftSide from "../components/LoginLeftSide";
 import { Link } from "react-router-dom";
 import { ShieldIcon, UserIcon, ArrowRightIcon } from "lucide-react";
-import { useAuth } from "../context/authContext";
+import { useAuth } from "../context/AuthContext";
 import Loading from "../components/Loading";
 import { Navigate } from "react-router-dom";
 
