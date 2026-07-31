@@ -22,7 +22,7 @@ import React,{useEffect, useState} from "react";
 import { useLocation } from "react-router-dom";
 import {dummyProfileData} from '../assets/assets'
 import { Link } from "react-router-dom";
-import { useAuth } from "../context/authContext";
+import { useAuth } from "../context/AuthContext";
 import api from "../api/axios";
 
 const Sidebar=()=>{
